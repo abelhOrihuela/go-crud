@@ -1,29 +1,29 @@
 package main
 
 import (
-	"net/http"	
+	// "net/http"	
 	"github.com/labstack/echo"
-	"./src/user"
+	"github.com/jinzhu/gorm"
+  _ "github.com/jinzhu/gorm/dialects/sqlite"
+	"./src/handlers"
+	"./src/models"
 )
 
-func hello(c echo.Context) (err error) {
-	u := new(user.User)
-	u.Email = "Abel"
-  if err = c.Bind(u); err != nil {
-    return
-  }
-  return c.JSON(http.StatusOK, u)
-}
-
-func handleRoot(c echo.Context) (err error) {
-	return c.String(http.StatusOK, "Hello, World!")
-}
-
-
 func main() {
+
+	db, err := gorm.Open("sqlite3", "test.db")
+  if err != nil {
+    panic("failed to connect database")
+  }
+	defer db.Close()
+
+	db.AutoMigrate(&models.User{})
+	db.Create(&models.User{Id: 200, Name: "L1212", Email: "abel@commonsense.io"})
+
+
 	e := echo.New()
-	e.GET("/", handleRoot)
-	e.GET("/users", hello)
+	e.GET("/users", handlersUser.Index)
+	e.POST("/users", handlersUser.Create)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
