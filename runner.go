@@ -18,11 +18,18 @@ func main() {
 	defer db.Close()
 
 	db.AutoMigrate(&models.User{})
-	db.Create(&models.User{Id: 200, Name: "L1212", Email: "abel@commonsense.io"})
+	db.Create(&models.User{Id: 3000, Name: "L1212jj", Email: "abejl@commonsense.io"})
 
 
 	e := echo.New()
-	e.GET("/users", handlersUser.Index)
+
+	e.GET("/users",  func(c echo.Context) error {
+		return handlersUser.Index(c, db)
+	})
+	e.GET("/users/:id",  func(c echo.Context) error {
+		return handlersUser.Show(c, db)
+	})
+
 	e.POST("/users", handlersUser.Create)
 
 	e.Logger.Fatal(e.Start(":1323"))
